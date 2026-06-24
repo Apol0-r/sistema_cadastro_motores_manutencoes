@@ -1,0 +1,12 @@
+# Ignorar executáveis do Windows
+*.exe
+
+# Ignorar executáveis do Linux/Mac
+*.out
+app
+
+# Ignorar arquivos de objetos
+*.o
+
+# Ignorar pastas de configuração do VS Code (opcional, mas recomendado)
+.vscode/

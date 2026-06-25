@@ -2,7 +2,60 @@
 
 int main(void) {
 
-    printf("Hello World!\n");
+    int opcao;
+    int entrada_valida;
+
+    do {
+
+        printf(" \n = MENU = \n");
+        printf("1.      Cadastrar motor\n");
+        printf("2.      Registrar manutenção\n");
+        printf("3.      Listar motores cadastrados\n");
+        printf("4.      Listar manuntenções registradas\n");
+        printf("5.      Exibir relatórios\n");
+        printf("6.      Sair do programa\n");
+        printf("\n        Opcao: ");
+
+        // Se o usuário digitar uma letra, entrada_valida recebe 0.
+        entrada_valida = scanf("%d", &opcao);
+
+        if (entrada_valida != 1) {
+            printf("\n[ERRO] Digite apenas numeros de 1 a 6!\n");
+            while (getchar() != '\n');
+            opcao = -1;
+            continue;
+        }
+
+        if (opcao < 0 || opcao > 6) {
+            printf("\n[ERRO] Digite apenas numeros de 1 a 6!\n");
+            continue;
+        }
+
+        switch (opcao){
+            case 1:
+                printf("\n[ERRO] Opcao 1 indisponivel.");
+                break;
+            
+            case 2:
+                printf("\n[ERRO] Opcao 2 indisponivel.");
+                break;
+            
+            case 3:
+                printf("\n[ERRO] Opcao 3 indisponivel.");
+                break;
+            
+            case 4:
+                printf("\n[ERRO] Opcao 4 indisponivel.");
+                break;
+            case 5:
+                printf("\n[ERRO] Opcao 5 indisponivel.");
+                break;
+            
+            case 6:
+                printf("\nSaindo...");
+        }
+
+    } while(opcao != 6);
 
     return 0;
 }

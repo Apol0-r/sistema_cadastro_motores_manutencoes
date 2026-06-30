@@ -9,10 +9,10 @@ int main(void) {
 
         printf(" \n = MENU = \n");
         printf("1.      Cadastrar motor\n");
-        printf("2.      Registrar manutenção\n");
+        printf("2.      Registrar manutencao\n");
         printf("3.      Listar motores cadastrados\n");
-        printf("4.      Listar manuntenções registradas\n");
-        printf("5.      Exibir relatórios\n");
+        printf("4.      Listar manuntencoes registradas\n");
+        printf("5.      Exibir relatorios\n");
         printf("6.      Sair do programa\n");
         printf("\n        Opcao: ");
 

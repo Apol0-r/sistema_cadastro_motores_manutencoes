@@ -3,7 +3,11 @@
 #include <string.h>
 #include <math.h>
 
-#define CHAR_MAX 100
+#define CHAR_MAX 100 // Limita os caracteres de um nome ou descrição.
+#define MOTORES_MAX 100 // Define um teto para a quantidade de motores a serem cadastrados.
+#define MANUTENCOES_MAX 100 // Define um teto para a quantidade manutenções realizadas.
+
+/* ============================================================================ */
 
 typedef struct{
     int id;
@@ -21,18 +25,49 @@ typedef struct {
 
 typedef struct {
     int id;
-    char tipo;
+    char tipo; 
     float custo;
     Ferramenta ferramenta_utilizada;
 
 } Manutencao;
 
+/* ============================================================================ */
+
+
+
+//         ARTHUR FAÇA A PARTE DO MOTOR AQUI
+
+
+
+
+/* ============================================================================ */
+
+
+/* ============================================================================ */
+
+
+int verificar_id_motor(void);
+
+
+void registrar_manutencao(void);
+void atualizar_matriz_resumo(void);
+void salvar_manutencoes_realizadas(void);
+
+
+
+/* ============================================================================ */
 
 
 int main(void) {
 
+    Motor motor[MOTORES_MAX];
+    Manutencao manutencao[MANUTENCOES_MAX];
+    float matriz_resumo[MOTORES_MAX][3]; 
+
+
     int opcao;
     int entrada_valida;
+
 
     do {
 

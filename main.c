@@ -1,5 +1,31 @@
 #include <stdio.h>
 
+#define CHAR_MAX 100
+
+typedef struct{
+    int id;
+    char nome[CHAR_MAX];
+    float potencia;
+
+} Motor;
+
+typedef struct {
+    int id;
+    char nome[CHAR_MAX];
+    char categoria[CHAR_MAX];
+
+} Ferramenta;
+
+typedef struct {
+    int id;
+    char tipo;
+    float custo;
+    Ferramenta ferramenta_utilizada;
+
+} Manutencao;
+
+
+
 int main(void) {
 
     int opcao;

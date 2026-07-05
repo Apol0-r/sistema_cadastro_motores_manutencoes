@@ -99,8 +99,50 @@ void cadastro_motor(int *ptr_mq, Motor motor[]){
 /* ============================================================================ */
 
 
+int verificar_id_motor(int id_informado, Motor motor[], int quantidade_motores){
+    // Essa função percorrer o vetor de motores atrás de uma correspondência para
+    // o vetor informado. Ela retorna o índice caso o encontre. No caso de não
+    // encontrá-lo, a função retornará -1 (um valor sentinela).
 
-void registrar_manutencao(void);
+    for (int i = 0; i < quantidade_motores; i++) {
+        if (id_informado == motor[i].id) {
+            return i;
+        }
+    }
+
+    return -1;
+};
+
+void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manutencao[], int quantidade_motores) {
+    // FUNÇÃO ATUALMENTE SEM TRATAMENTO PARA A ENTRADA DE DADOS INVÁLIDOS PELO USUÁRIO
+
+    int id_motor;
+    char tipo_manutencao;
+    int variavel_sentinela;
+
+    printf("\nInsira o ID do motor: ");
+    scanf("%d", &id_motor);
+
+    manutencao[*ptr_manutencoes].id = motor[variavel_sentinela].id;
+
+    if (variavel_sentinela == -1){
+        printf("\n[ERRO] ID invalida.\n");
+        return;
+    }
+
+    manutencao[*ptr_manutencoes].id = variavel_sentinela;
+    printf("Insira o tipo de manutencao: ");
+    scanf(" %c", &manutencao[*ptr_manutencoes].tipo);
+
+    printf("Insira o custo de manutencao: ");
+    scanf("%lf", &manutencao[*ptr_manutencoes].custo);
+
+    // Vou insirir a parte da ferramenta logo, logo...
+
+    printf("\n[SUCESSO] Manutencao registrada para o motor ID %d!\n", motor[variavel_sentinela].id);
+    (*ptr_manutencoes)++;
+};
+
 void atualizar_matriz_resumo(void);
 void salvar_manutencoes_realizadas(void);
 
@@ -117,6 +159,10 @@ int main(void) {
     int opcao;
     int entrada_valida;
     int motores_quantidade;
+
+    int manuntecao_atual = 0; 
+    // Ao mesmo tempo que me informa a posição no vetor,
+    // me informa a quantidade total de manunteções já feitas (manutencao atual += 1;).
 
     do {
 

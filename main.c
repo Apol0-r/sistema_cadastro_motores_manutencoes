@@ -38,7 +38,7 @@ void cadastro_motor(int *ptr_mq, Motor motor[]){
     scanf("%d", ptr_mq);
 
     //Avalia se o usuário digitou a quantidade certa de motores que deseja cadastrar
-    while(*ptr_mq < 0 || *ptr_mq > MOTORES_MAX){
+    while(*ptr_mq <= 0 || *ptr_mq > MOTORES_MAX){
         printf("\nValor Invalido!! Insira novamente quantos motores serao cadastrados: ");
         scanf("%d", ptr_mq);
     }

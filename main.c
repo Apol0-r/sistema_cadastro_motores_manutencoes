@@ -7,6 +7,8 @@
 #define MOTORES_MAX 100 // Define um teto para a quantidade de motores a serem cadastrados.
 #define MANUTENCOES_MAX 100 // Define um teto para a quantidade manutenções realizadas.
 
+double matriz_resumo[MOTORES_MAX][3]; // A matriz resumo é declarada globalmente. Todos as suas casas estão preenchidas por 0;
+
 /* ============================================================================ */
 
 typedef struct{
@@ -123,28 +125,110 @@ void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manuten
     printf("\nInsira o ID do motor: ");
     scanf("%d", &id_motor);
 
-    manutencao[*ptr_manutencoes].id = motor[variavel_sentinela].id;
+    variavel_sentinela = verificar_id_motor(id_motor, motor, quantidade_motores);
+
+   
 
     if (variavel_sentinela == -1){
         printf("\n[ERRO] ID invalida.\n");
         return;
     }
 
-    manutencao[*ptr_manutencoes].id = variavel_sentinela;
+    manutencao[*ptr_manutencoes].id = motor[variavel_sentinela].id;
+
     printf("Insira o tipo de manutencao: ");
     scanf(" %c", &manutencao[*ptr_manutencoes].tipo);
 
     printf("Insira o custo de manutencao: ");
     scanf("%lf", &manutencao[*ptr_manutencoes].custo);
 
-    // Vou insirir a parte da ferramenta logo, logo...
+    // CADASTRO DA FERRAMENTA:
+    printf("    ID da ferramenta: ");
+    scanf("%d", &manutencao[*ptr_manutencoes].ferramenta_utilizada.id);
+   
+    getchar();
+    printf("    Nome da ferramenta: ");
+    fgets(manutencao[*ptr_manutencoes].ferramenta_utilizada.nome, CHAR_MAX, stdin);
+    manutencao[*ptr_manutencoes].ferramenta_utilizada.nome[strcspn(manutencao[*ptr_manutencoes].ferramenta_utilizada.nome, "\n")] = '\0';
+    
+
+    printf("    Categoria da ferramenta: ");
+    fgets(manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria, CHAR_MAX, stdin);
+    manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria[strcspn(manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria, "\n")] = '\0';
 
     printf("\n[SUCESSO] Manutencao registrada para o motor ID %d!\n", motor[variavel_sentinela].id);
+
     (*ptr_manutencoes)++;
+
+    salvar_manutencoes_realizadas(manutencao, *ptr_manutencoes);
 };
 
-void atualizar_matriz_resumo(void);
-void salvar_manutencoes_realizadas(void);
+void atualizar_matriz_resumo(int indice, char tipo, double custo){
+
+    if (tipo == 'P') {
+        matriz_resumo[indice][0]++; 
+    } else if (tipo == 'C') {
+        matriz_resumo[indice][1]++;
+    }
+
+    matriz_resumo[indice][2] += custo;
+    
+}
+
+int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
+    int quantidade_manutencoes = 0;
+    FILE *arquivo = fopen("manutecoes.txt", "r");
+
+    if (arquivo == NULL) {
+        printf("\n[ERRO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para leitura.\n");
+        return 0;
+    }
+
+    while (fscanf(arquivo, "%d; %c;%.2f;%d;%s;%s\n",
+        &manutencao[quantidade_manutencoes].id,
+        &manutencao[quantidade_manutencoes].tipo,
+        &manutencao[quantidade_manutencoes].custo,
+        &manutencao[quantidade_manutencoes].ferramenta_utilizada.id,
+        &manutencao[quantidade_manutencoes].ferramenta_utilizada.nome,
+        &manutencao[quantidade_manutencoes].ferramenta_utilizada.categoria) == 6) {
+            quantidade_manutencoes++;
+        } 
+
+
+    fclose(arquivo);
+    printf("\n[SUCESSO] %d manutencoes carregadas da memoria!\n", quantidade_manutencoes);
+
+    return quantidade_manutencoes;
+
+}
+
+void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quantidade){
+
+
+    FILE *arquivo = fopen("manutencoes.txt", "w");
+
+
+
+    if (arquivo == NULL) {
+        printf("\n[ERRO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para salvar.\n");
+        return;
+    }
+
+    for (int i = 0; i < manutencoes_quantidade; i++){
+        fprintf(arquivo, "%d;%c;%.2f;%d;%s;%s\n",
+            manutencao[i].id,
+            manutencao[i].tipo,
+            manutencao[i].custo,
+            manutencao[i].ferramenta_utilizada.id,
+            manutencao[i].ferramenta_utilizada.nome,
+            manutencao[i].ferramenta_utilizada.categoria
+        );
+    }
+
+    fclose(arquivo);
+    printf("\n[SUCESSO] %d manutencoes salvas com exito!\n", manutencoes_quantidade);
+
+}
 
 
 
@@ -155,15 +239,14 @@ int main(void) {
 
     Motor motor[MOTORES_MAX];
     Manutencao manutencao[MANUTENCOES_MAX];
-    float matriz_resumo[MOTORES_MAX][3]; 
+    
     int opcao;
     int entrada_valida;
     int motores_quantidade;
-
-    int manuntecao_atual = 0; 
-    // Ao mesmo tempo que me informa a posição no vetor,
-    // me informa a quantidade total de manunteções já feitas (manutencao atual += 1;).
-
+    
+    // A variável 'manutencao_atual' recebe o total carregado do arquivo
+    int manuntecao_atual = carregar_manutencoes_realizadas(manutencao); 
+    
     do {
 
         printf(" \n = MENU = \n");
@@ -190,11 +273,12 @@ int main(void) {
         switch (opcao){
             case 1:
                 cadastro_motor(&motores_quantidade, motor);
-                printf("\nMotores cadastrados com sucesso!!");
+                printf("\nMotores cadastrados com sucesso!!\n");
                 break;
             
             case 2:
-                printf("\n[ERRO] Opcao 2 indisponivel.");
+                registrar_manutencao(&manuntecao_atual, motor, manutencao, motores_quantidade);
+                printf("\n Manutencao cadastrada com sucesso!!\n");
                 break;
             
             case 3:

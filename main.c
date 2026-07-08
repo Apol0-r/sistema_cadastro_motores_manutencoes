@@ -51,7 +51,7 @@ void cadastro_motor(int *ptr_mq, Motor motor[]){
         //Avalia se o usuário digitou uma ID diferente das outras
         do{
             id_duplicada = 0;
-            printf("\nInsira a ID do motor(%d): ", i+1);
+            printf("\nInsira a ID do motor(%d): ", i + 1);
             scanf("%d", &motor[i].id);
 
             //Avalia se o usuário digitou um número positivo
@@ -79,22 +79,72 @@ void cadastro_motor(int *ptr_mq, Motor motor[]){
             printf("\nInsira o nome ou descricao do motor(%d): ", i+1);
             fgets(motor[i].nome, CHAR_MAX, stdin);
             motor[i].nome[strcspn(motor[i].nome, "\n")] = '\0';
-            if(motor[i].nome[0] == '\0') printf("\n[ERRO] O nome nao pode ser vazio!\n");
+            if(motor[i].nome[0] == '\0') printf("\nValor invalido!! O nome nao pode ser vazio!\n");
         }while(motor[i].nome[0] == '\0'); // Verifica o primeiro caractere
         
-        printf("Insira a potencia do motor(%d)", i+1);
+        printf("\nInsira a potencia do motor(%d): ", i+1);
         scanf("%lf", &motor[i].potencia);
         while(motor[i].potencia <= 0){
-            printf("Valor invalido!! Insira a potencia do motor(%d) novamente: ", i+1);
+            printf("\nValor invalido!! Insira a potencia do motor(%d) novamente: ", i+1);
             scanf("%lf", &motor[i].potencia);
         }
+        printf("\n-------------------------------------------------------\n");
     }
 
 }
 
+void listar_motor(int *ptr_mq, Motor motor[]){
+    printf("\n%-4s \t %-10s \t %-50s \t %-10s\n", "NUM", "ID", "NOME", "POTENCIA");
+    printf("--------------------------------------------------------------------------------------------\n");
+    for(int i = 0; i < *ptr_mq; i++){
+        printf("%-4d \t %-10d \t %-50s \t %.2lf kW\n", i + 1, motor[i].id, motor[i].nome, motor[i].potencia);
+    }
+}
 
+void salvar_motores(int *ptr_mq, Motor motor[]){
+    //Abre o arquivo que vai salvar os dados dos motores
+    FILE *fp = fopen("motores.txt", "wt");
+    //Confere se o arquivo pode ser aberto ou não
+    if (fp == NULL) {
+        printf("\n[ERRO] Nao foi possivel abrir o arquivo para salvar!\n");
+        return;
+    }
+    //grava os dados no arquivo motores.txt
+    for(int i = 0; i < *ptr_mq; i++) fprintf(fp, "%d;%s;%.2lf\n", motor[i].id, motor[i].nome, motor[i].potencia);
+    //fecha o arquivo
+    fclose(fp);
+    printf("\nDados salvos com sucesso em 'motores.txt'!\n");
+}
 
+void carregar_motores(int *ptr_mq, Motor motor[]){
+    int i = 0;
+    int j = 0;
+    char c;
+    //Abre o arquivo para leitura
+    FILE *arquivo = fopen("motores.txt", "rt");
+    //Verifica se o arquivo pode ser aberto
+    if (arquivo == NULL) {
+        *ptr_mq = 0; //Garante que comece com zero motores 
+        printf("\n[AVISO] Nao foi possivel abrir o arquivo 'motores.txt' para leitura.\n");
+        return;
+    }
+    // Tenta ler o ID e já consome o primeiro ';'
+    while (fscanf(arquivo, "%d;", &motor[i].id) == 1) {
+    // Lê o nome caractere por caractere até encontrar o próximo ';'
+        // fgetc captura o próximo caractere do arquivo
+        while ((c = fgetc(arquivo)) != ';' && c != EOF) {
+            motor[i].nome[j] = c;
+            j++;
+        }
+        motor[i].nome[j] = '\0'; // Finaliza a string do nome
 
+        // Lê a potência e o pula para a próxima linha (\n)
+        fscanf(arquivo, "%lf\n", &motor[i].potencia);
+        i++;
+    }
+    *ptr_mq = i;
+    fclose(arquivo);
+}
 /* ============================================================================ */
 
 
@@ -115,7 +165,7 @@ int verificar_id_motor(int id_informado, Motor motor[], int quantidade_motores){
     return -1;
 };
 
-void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manutencao[], int quantidade_motores) {
+/*void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manutencao[], int quantidade_motores) {
     // FUNÇÃO ATUALMENTE SEM TRATAMENTO PARA A ENTRADA DE DADOS INVÁLIDOS PELO USUÁRIO
 
     int id_motor;
@@ -161,7 +211,7 @@ void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manuten
     (*ptr_manutencoes)++;
 
     salvar_manutencoes_realizadas(manutencao, *ptr_manutencoes);
-};
+}*/
 
 void atualizar_matriz_resumo(int indice, char tipo, double custo){
 
@@ -180,7 +230,7 @@ int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
     FILE *arquivo = fopen("manutecoes.txt", "r");
 
     if (arquivo == NULL) {
-        printf("\n[ERRO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para leitura.\n");
+        printf("\n[AVISO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para leitura.\n");
         return 0;
     }
 
@@ -202,7 +252,7 @@ int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
 
 }
 
-void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quantidade){
+/*void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quantidade){
 
 
     FILE *arquivo = fopen("manutencoes.txt", "w");
@@ -228,7 +278,7 @@ void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quan
     fclose(arquivo);
     printf("\n[SUCESSO] %d manutencoes salvas com exito!\n", manutencoes_quantidade);
 
-}
+}*/
 
 
 
@@ -246,7 +296,7 @@ int main(void) {
     
     // A variável 'manutencao_atual' recebe o total carregado do arquivo
     int manuntecao_atual = carregar_manutencoes_realizadas(manutencao); 
-    
+    carregar_motores(&motores_quantidade, motor);
     do {
 
         printf(" \n = MENU = \n");
@@ -255,19 +305,20 @@ int main(void) {
         printf("3.      Listar motores cadastrados\n");
         printf("4.      Listar manuntencoes registradas\n");
         printf("5.      Exibir relatorios\n");
-        printf("6.      Sair do programa\n");
+        printf("6.      Salvar dados\n");
+        printf("7.      Sair do programa\n");
         printf("\n        Opcao: ");
 
         // Se o usuário digitar uma letra, entrada_valida recebe 0.
         entrada_valida = scanf("%d", &opcao);
         if (entrada_valida != 1) {
-            printf("\n[ERRO] Digite apenas numeros de 1 a 6!\n");
+            printf("\n[ERRO] Digite apenas numeros de 1 a 7!\n");
             while (getchar() != '\n');
             opcao = -1;
             continue;
         }
-        if (opcao < 0 || opcao > 6) {
-            printf("\n[ERRO] Digite apenas numeros de 1 a 6!\n");
+        if (opcao < 0 || opcao > 7) {
+            printf("\n[ERRO] Digite apenas numeros de 1 a 7!\n");
             continue;
         }
         switch (opcao){
@@ -277,23 +328,31 @@ int main(void) {
                 break;
             
             case 2:
-                registrar_manutencao(&manuntecao_atual, motor, manutencao, motores_quantidade);
+                //registrar_manutencao(&manuntecao_atual, motor, manutencao, motores_quantidade);
                 printf("\n Manutencao cadastrada com sucesso!!\n");
                 break;
             
             case 3:
-                printf("\n[ERRO] Opcao 3 indisponivel.");
+                if(motores_quantidade == 0) printf("\n0 motores cadastrados, impossivel listar!!\n");
+                else listar_motor(&motores_quantidade, motor);
                 break;
             
             case 4:
                 printf("\n[ERRO] Opcao 4 indisponivel.");
                 break;
+
             case 5:
                 printf("\n[ERRO] Opcao 5 indisponivel.");
                 break;
             
             case 6:
-                printf("\nSaindo...");
+                salvar_motores(&motores_quantidade, motor);
+                printf("\nDados salvos com sucesso!!\n");
+                break;
+
+            case 7:
+                salvar_motores(&motores_quantidade, motor);
+                printf("\nSaindo...\n");
         }
 
     } while(opcao != 6);

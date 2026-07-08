@@ -1,3 +1,9 @@
+/* 
+ * Nome: Arthur Sobral Moreira e Ricardo A.B. Barbosa
+ * Disciplina: Programação I - Engenharia Elétrica
+ * Trabalho Computacional: Cadastro de Motores
+ */
+
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
@@ -36,8 +42,9 @@ typedef struct {
 /* ============================================================================ */
 void cadastro_motor(int *ptr_mq, Motor motor[]){
     int id_duplicada;
-    printf("\nInsira a quantidade de motores para cadastrar: ");
+    printf("\n\nInsira a quantidade de motores para cadastrar: ");
     scanf("%d", ptr_mq);
+    printf("\n-------------------------------------------------------\n");
 
     //Avalia se o usuário digitou a quantidade certa de motores que deseja cadastrar
     while(*ptr_mq <= 0 || *ptr_mq > MOTORES_MAX){
@@ -118,7 +125,6 @@ void salvar_motores(int *ptr_mq, Motor motor[]){
 
 void carregar_motores(int *ptr_mq, Motor motor[]){
     int i = 0;
-    int j = 0;
     char c;
     //Abre o arquivo para leitura
     FILE *arquivo = fopen("motores.txt", "rt");
@@ -130,7 +136,8 @@ void carregar_motores(int *ptr_mq, Motor motor[]){
     }
     // Tenta ler o ID e já consome o primeiro ';'
     while (fscanf(arquivo, "%d;", &motor[i].id) == 1) {
-    // Lê o nome caractere por caractere até encontrar o próximo ';'
+        int j = 0; // reseta j para 0 a cada novo motor
+        // Lê o nome caractere por caractere até encontrar o próximo ';'
         // fgetc captura o próximo caractere do arquivo
         while ((c = fgetc(arquivo)) != ';' && c != EOF) {
             motor[i].nome[j] = c;
@@ -311,9 +318,10 @@ int main(void) {
 
         // Se o usuário digitar uma letra, entrada_valida recebe 0.
         entrada_valida = scanf("%d", &opcao);
+        // Limpeza de buffer obrigatória após o scanf
+        while (getchar() != '\n'); 
         if (entrada_valida != 1) {
             printf("\n[ERRO] Digite apenas numeros de 1 a 7!\n");
-            while (getchar() != '\n');
             opcao = -1;
             continue;
         }
@@ -355,6 +363,6 @@ int main(void) {
                 printf("\nSaindo...\n");
         }
 
-    } while(opcao != 6);
+    } while(opcao != 7);
     return 0;
 }

@@ -1,5 +1,5 @@
 /* 
- * Nome: Arthur Sobral Moreira e Ricardo A.B. Barbosa
+ * Nome: Arthur Sobral Moreira e Ricardo Augusto Bona Barbosa
  * Disciplina: Programação I - Engenharia Elétrica
  * Trabalho Computacional: Cadastro de Motores
  */
@@ -14,6 +14,7 @@
 #define MANUTENCOES_MAX 100 // Define um teto para a quantidade manutenções realizadas.
 
 double matriz_resumo[MOTORES_MAX][3]; // A matriz resumo é declarada globalmente. Todos as suas casas estão preenchidas por 0;
+int vetores_ids_motores[MOTORES_MAX]; // Vetor que armazena o ID de cada motor já cadastrado. Ele é essencial para a geração do relatório.
 
 /* ============================================================================ */
 
@@ -101,6 +102,12 @@ void cadastro_motor(int *ptr_mq, Motor motor[]){
 }
 
 void listar_motor(int *ptr_mq, Motor motor[]){
+
+    if (*ptr_mq == 0) {
+        printf("\n[AVISO] Nenhum motor cadastrado para listar.\n");
+        return;
+    }
+
     printf("\n%-4s \t %-10s \t %-50s \t %-10s\n", "NUM", "ID", "NOME", "POTENCIA");
     printf("--------------------------------------------------------------------------------------------\n");
     for(int i = 0; i < *ptr_mq; i++){
@@ -154,10 +161,7 @@ void carregar_motores(int *ptr_mq, Motor motor[]){
 }
 /* ============================================================================ */
 
-
 /* ============================================================================ */
-
-
 int verificar_id_motor(int id_informado, Motor motor[], int quantidade_motores){
     // Essa função percorrer o vetor de motores atrás de uma correspondência para
     // o vetor informado. Ela retorna o índice caso o encontre. No caso de não
@@ -172,7 +176,12 @@ int verificar_id_motor(int id_informado, Motor motor[], int quantidade_motores){
     return -1;
 };
 
-/*void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manutencao[], int quantidade_motores) {
+void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manutencao[], int quantidade_motores) {
+    // Essa função é responsável pela captação de novas manutenções, sendo estas inseridas pelo usuário.
+    // Ela recebe um ponteiro em seu parâmetro pois dessa forma ela é capaz de atualizar a quantidade manutenções
+    // já realizadas (registradas anteriormente à execução do código). Essa informação é salva lá na main em 'manutencao_atual'.
+
+
     // FUNÇÃO ATUALMENTE SEM TRATAMENTO PARA A ENTRADA DE DADOS INVÁLIDOS PELO USUÁRIO
 
     int id_motor;
@@ -216,40 +225,33 @@ int verificar_id_motor(int id_informado, Motor motor[], int quantidade_motores){
     printf("\n[SUCESSO] Manutencao registrada para o motor ID %d!\n", motor[variavel_sentinela].id);
 
     (*ptr_manutencoes)++;
-
-    salvar_manutencoes_realizadas(manutencao, *ptr_manutencoes);
-}*/
-
-void atualizar_matriz_resumo(int indice, char tipo, double custo){
-
-    if (tipo == 'P') {
-        matriz_resumo[indice][0]++; 
-    } else if (tipo == 'C') {
-        matriz_resumo[indice][1]++;
-    }
-
-    matriz_resumo[indice][2] += custo;
-    
 }
 
 int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
+
+    // Logo no início do programa essa função é rodada a fim de carregar todas as manutenções feitas anterior à 
+    // execução do código, indicando, dessa forma, quantas manutenções foram feitas anteriormente. Caso ela não 
+    // consiga abrir o arquivo ela apontará este erro, tal como se ela abrir o arquivo e não conter nenhuma manutenção
+    // ela informará ao usuário.
+
     int quantidade_manutencoes = 0;
-    FILE *arquivo = fopen("manutecoes.txt", "r");
+    FILE *arquivo = fopen("manutencoes.txt", "r");
 
     if (arquivo == NULL) {
         printf("\n[AVISO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para leitura.\n");
         return 0;
     }
 
-    while (fscanf(arquivo, "%d; %c;%.2f;%d;%s;%s\n",
+    while (fscanf(arquivo, "%d; %c;%lf;%d;%[^;];%[^;\n]\n",
         &manutencao[quantidade_manutencoes].id,
         &manutencao[quantidade_manutencoes].tipo,
         &manutencao[quantidade_manutencoes].custo,
         &manutencao[quantidade_manutencoes].ferramenta_utilizada.id,
-        &manutencao[quantidade_manutencoes].ferramenta_utilizada.nome,
-        &manutencao[quantidade_manutencoes].ferramenta_utilizada.categoria) == 6) {
-            quantidade_manutencoes++;
-        } 
+        manutencao[quantidade_manutencoes].ferramenta_utilizada.nome,
+        manutencao[quantidade_manutencoes].ferramenta_utilizada.categoria) == 6) {
+        
+        quantidade_manutencoes++;
+    }
 
 
     fclose(arquivo);
@@ -259,8 +261,10 @@ int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
 
 }
 
-/*void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quantidade){
+void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quantidade){
 
+    // Como o próprio nome já diz, essa função é responsável por salvar todo o conteúdo do vetor estrutura manutencao[]
+    // num .txt. A função não sobrescreve o conteúdo pré-existente, ela adiciona o novo conteúdo na linha de baixo.
 
     FILE *arquivo = fopen("manutencoes.txt", "w");
 
@@ -285,12 +289,112 @@ int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
     fclose(arquivo);
     printf("\n[SUCESSO] %d manutencoes salvas com exito!\n", manutencoes_quantidade);
 
-}*/
+}
 
+void listar_manutencoes(Manutencao manutencao[], int quantidade_manutencoes) {
+    
+    // Essa função é utilizada para listar todas as manunteções atualmente registradas. Ela imprime todas elas
+    // para que o usuário tenha noção do que foi realizado.
 
+    if (quantidade_manutencoes == 0) {
+        printf("\n[AVISO] Nenhuma manutencao cadastrada para listar.\n");
+        return;
+    }
 
+    printf("\n%-4s \t %-6s \t %-5s \t %-10s \t %-8s \t %-20s\n", 
+           "NUM", "ID_MOT", "TIPO", "CUSTO", "ID_FERR", "FERRAMENTA");
+    printf("--------------------------------------------------------------------------------------------\n");
+    
+    for(int i = 0; i < quantidade_manutencoes; i++){
+        
+        printf("%-4d \t %-6d \t %-5c \t R$ %-7.2lf \t %-8d \t %-20s\n", 
+            i + 1, 
+            manutencao[i].id,               
+            manutencao[i].tipo,             
+            manutencao[i].custo,            
+            manutencao[i].ferramenta_utilizada.id,   
+            manutencao[i].ferramenta_utilizada.nome  
+        );
+    }
+}
+
+void carregar_matriz_resumo(Motor motor[], int quantidade_motores, Manutencao manutencao[], int quantidade_manutencoes){
+    
+    // Essa função permite que carreguemos a matriz resumo (definida globalmente) com
+    // os dados respectivos à cada motor cadastrado. A identação dos laços for se dá 
+    // devido à necessidade de separar as manutenções realizadas por ID, uma vez que 
+    // cada linha da matriz simboliza um motor diferente.
+
+    for (int i = 0; i < quantidade_motores; i++) {
+        int id = motor[i].id;
+
+        vetores_ids_motores[i] = motor[i].id;
+
+        for (int j = 0; j < quantidade_manutencoes; j++) {
+            if (id == manutencao[j].id) {
+                
+                if (manutencao[j].tipo == 'P') {
+                    matriz_resumo[i][0]++;
+                } else if (manutencao[j].tipo == 'C') {
+                    matriz_resumo[i][1]++;
+                }
+                matriz_resumo[i][2] += manutencao[j].custo;
+            }
+        }
+    }
+}
+
+void exibir_relatorio(Manutencao manutencao[], int quantidade_manutencoes, Motor motor[], int quantidade_motores) {
+    
+    // A função exibe o relatório geral dos motores, quantidade de manutenções preventivas, corretivas etc. Enfim, o funcionamento
+    // é concebido graças à função 'carregar_matriz_resumo' que atualiza os dados da matriz global, tal como o vetor_ids_motores, 
+    // que também é global. Sendo assim, não fica difícil manipular os dados e computá-los.
+    
+
+    if (quantidade_motores == 0) {
+        printf("\n[AVISO] Nenhum motor cadastrado para gerar relatorio.\n");
+        return;
+    }
+
+    carregar_matriz_resumo(motor, quantidade_motores, manutencao, quantidade_manutencoes);
+
+    
+    int id_motor_maior_custo = motor[0].id;
+    double maior_custo_acumulado = matriz_resumo[0][2];
+    double valor_gasto_manutencoes_preventivas = 0;
+    double valor_gasto_manutencoes_corretivas = 0;
+
+    printf("\n=================== RELATORIO DE MOTORES ===================\n");
+
+    for (int i = 0; i < quantidade_motores; i++) {
+        
+        printf("\nMotor ID (%d):\n", motor[i].id);
+        printf("  - Quantidade manutencoes preventivas: %.0f\n", matriz_resumo[i][0]);
+        printf("  - Quantidade manutencoes corretivas: %.0f\n", matriz_resumo[i][1]);
+        printf("  - Custo total acumulado: R$ %.2f\n", matriz_resumo[i][2]);
+
+        
+        if (matriz_resumo[i][2] > maior_custo_acumulado) {
+            maior_custo_acumulado = matriz_resumo[i][2];
+            id_motor_maior_custo = motor[i].id; 
+        }
+    }
+
+    for (int j = 0; j < quantidade_manutencoes; j++) {
+        if (manutencao[j].tipo == 'P') {
+            valor_gasto_manutencoes_preventivas += manutencao[j].custo;
+        } else if (manutencao[j].tipo == 'C') {
+            valor_gasto_manutencoes_corretivas += manutencao[j].custo;
+        }
+    }
+
+    printf("\n=================== RESUMO CONSOLIDADO ===================\n");
+    printf("-> Motor com maior custo acumulado: ID %d (R$ %.2lf)\n", id_motor_maior_custo, maior_custo_acumulado);
+    printf("-> Valor total gasto em manutencoes preventivas: R$ %.2lf\n", valor_gasto_manutencoes_preventivas);
+    printf("-> Valor total gasto em manutencoes corretivas: R$ %.2lf\n", valor_gasto_manutencoes_corretivas);
+    printf("==========================================================\n");
+}
 /* ============================================================================ */
-
 
 int main(void) {
 
@@ -303,6 +407,7 @@ int main(void) {
     
     // A variável 'manutencao_atual' recebe o total carregado do arquivo
     int manuntecao_atual = carregar_manutencoes_realizadas(manutencao); 
+
     carregar_motores(&motores_quantidade, motor);
     do {
 
@@ -336,25 +441,25 @@ int main(void) {
                 break;
             
             case 2:
-                //registrar_manutencao(&manuntecao_atual, motor, manutencao, motores_quantidade);
+                registrar_manutencao(&manuntecao_atual, motor, manutencao, motores_quantidade);
                 printf("\n Manutencao cadastrada com sucesso!!\n");
                 break;
             
             case 3:
-                if(motores_quantidade == 0) printf("\n0 motores cadastrados, impossivel listar!!\n");
-                else listar_motor(&motores_quantidade, motor);
+                listar_motor(&motores_quantidade, motor);
                 break;
             
             case 4:
-                printf("\n[ERRO] Opcao 4 indisponivel.");
+                listar_manutencoes(manutencao, manuntecao_atual);
                 break;
 
             case 5:
-                printf("\n[ERRO] Opcao 5 indisponivel.");
+                exibir_relatorio(manutencao, manuntecao_atual, motor, motores_quantidade);
                 break;
             
             case 6:
                 salvar_motores(&motores_quantidade, motor);
+                salvar_manutencoes_realizadas(manutencao, manuntecao_atual);
                 printf("\nDados salvos com sucesso!!\n");
                 break;
 

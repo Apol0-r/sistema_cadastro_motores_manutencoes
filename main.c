@@ -229,7 +229,7 @@ void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manuten
     (*ptr_manutencoes)++;
 }
 
-int carregar_manutencoes_realizadas(int *ptr_manutencoes, Manutencao manutencao[]) {
+int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
 
     // Logo no início do programa essa função é rodada a fim de carregar todas as manutenções feitas anterior à 
     // execução do código, indicando, dessa forma, quantas manutenções foram feitas anteriormente. Caso ela não 
@@ -243,8 +243,6 @@ int carregar_manutencoes_realizadas(int *ptr_manutencoes, Manutencao manutencao[
         printf("\n[AVISO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para leitura.\n");
         return 0;
     }
-
-    // for (*ptr) //
 
     while (fscanf(arquivo, "%d; %c;%lf;%d;%[^;];%[^;\n]\n",
         &manutencao[quantidade_manutencoes].id,
@@ -410,7 +408,7 @@ int main(void) {
     int motores_quantidade;
     
     // A variável 'manutencao_atual' recebe o total carregado do arquivo
-    int manuntecao_atual = carregar_manutencoes_realizadas(manutencao); 
+    int manuntencoes_anteriores = carregar_manutencoes_realizadas(manutencao); 
 
     carregar_motores(&motores_quantidade, motor);
     do {
@@ -425,15 +423,6 @@ int main(void) {
         printf("7.      Sair do programa\n");
         printf("\n        Opcao: ");
 
-        // Se o usuário digitar uma letra, entrada_valida recebe 0.
-        entrada_valida = scanf("%d", &opcao);
-        // Limpeza de buffer obrigatória após o scanf
-        while (getchar() != '\n'); 
-        if (entrada_valida != 1) {
-            printf("\n[ERRO] Digite apenas numeros de 1 a 7!\n");
-            opcao = -1;
-            continue;
-        }
         if (opcao < 0 || opcao > 7) {
             printf("\n[ERRO] Digite apenas numeros de 1 a 7!\n");
             continue;
@@ -445,8 +434,8 @@ int main(void) {
                 break;
             
             case 2:
-                registrar_manutencao(&manuntecao_atual, motor, manutencao, motores_quantidade);
-                printf("\n Manutencao cadastrada com sucesso!!\n");
+                // registrar_manutencao(&manuntencoes_anteriores, motor, manutencao, motores_quantidade);
+                // printf("\n Manutencao cadastrada com sucesso!!\n");
                 break;
             
             case 3:
@@ -454,16 +443,16 @@ int main(void) {
                 break;
             
             case 4:
-                listar_manutencoes(manutencao, manuntecao_atual);
+                // listar_manutencoes(manutencao, manuntencoes_anteriores);
                 break;
 
             case 5:
-                exibir_relatorio(manutencao, manuntecao_atual, motor, motores_quantidade);
+                // exibir_relatorio(manutencao, manuntencoes_anteriores, motor, motores_quantidade);
                 break;
             
             case 6:
                 salvar_motores(&motores_quantidade, motor);
-                salvar_manutencoes_realizadas(manutencao, manuntecao_atual);
+                // salvar_manutencoes_realizadas(manutencao, manuntencoes_anteriores);
                 printf("\nDados salvos com sucesso!!\n");
                 break;
 

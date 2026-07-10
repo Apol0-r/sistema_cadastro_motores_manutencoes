@@ -127,7 +127,7 @@ void salvar_motores(int *ptr_mq, Motor motor[]){
     for(int i = 0; i < *ptr_mq; i++) fprintf(fp, "%d;%s;%.2lf\n", motor[i].id, motor[i].nome, motor[i].potencia);
     //fecha o arquivo
     fclose(fp);
-    printf("\nDados salvos com sucesso em 'motores.txt'!\n");
+    printf("\nDados salvos com sucesso em 'motores.txt'!\n"); 
 }
 
 void carregar_motores(int *ptr_mq, Motor motor[]){
@@ -157,6 +157,8 @@ void carregar_motores(int *ptr_mq, Motor motor[]){
         i++;
     }
     *ptr_mq = i;
+
+    printf("\n[SUCESSO] %d motores anteriores carregados da memoria!\n", *ptr_mq);
     fclose(arquivo);
 }
 /* ============================================================================ */
@@ -227,7 +229,7 @@ void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manuten
     (*ptr_manutencoes)++;
 }
 
-int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
+int carregar_manutencoes_realizadas(int *ptr_manutencoes, Manutencao manutencao[]) {
 
     // Logo no início do programa essa função é rodada a fim de carregar todas as manutenções feitas anterior à 
     // execução do código, indicando, dessa forma, quantas manutenções foram feitas anteriormente. Caso ela não 
@@ -235,12 +237,14 @@ int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
     // ela informará ao usuário.
 
     int quantidade_manutencoes = 0;
-    FILE *arquivo = fopen("manutencoes.txt", "r");
+    FILE *arquivo = fopen("manutencoes.txt", "rt");
 
     if (arquivo == NULL) {
         printf("\n[AVISO] Nao foi possivel abrir o arquivo 'manutencoes.txt' para leitura.\n");
         return 0;
     }
+
+    // for (*ptr) //
 
     while (fscanf(arquivo, "%d; %c;%lf;%d;%[^;];%[^;\n]\n",
         &manutencao[quantidade_manutencoes].id,
@@ -255,7 +259,7 @@ int carregar_manutencoes_realizadas(Manutencao manutencao[]) {
 
 
     fclose(arquivo);
-    printf("\n[SUCESSO] %d manutencoes carregadas da memoria!\n", quantidade_manutencoes);
+    printf("\n[SUCESSO] %d manutencoes anteriores carregadas da memoria!\n", quantidade_manutencoes);
 
     return quantidade_manutencoes;
 
@@ -266,7 +270,7 @@ void salvar_manutencoes_realizadas(Manutencao manutencao[], int manutencoes_quan
     // Como o próprio nome já diz, essa função é responsável por salvar todo o conteúdo do vetor estrutura manutencao[]
     // num .txt. A função não sobrescreve o conteúdo pré-existente, ela adiciona o novo conteúdo na linha de baixo.
 
-    FILE *arquivo = fopen("manutencoes.txt", "w");
+    FILE *arquivo = fopen("manutencoes.txt", "wt");
 
 
 

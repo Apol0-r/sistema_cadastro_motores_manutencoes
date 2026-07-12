@@ -206,78 +206,83 @@ int verificar_tipo_manutencao(char tipo_informdo) {
 
 }
 
-void registrar_manutencao(int *ptr_manutencoes, Motor motor[],Manutencao manutencao[], int quantidade_motores) {
-    // Essa função é responsável pela captação de novas manutenções, sendo estas inseridas pelo usuário.
-    // Ela recebe um ponteiro em seu parâmetro pois dessa forma ela é capaz de atualizar a quantidade manutenções
-    // já realizadas (registradas anteriormente à execução do código). Essa informação é salva lá na main em 'manutencao_atual'.
-
-
+void registrar_manutencao(int *ptr_manutencoes, Motor motor[], Manutencao manutencao[], int quantidade_motores) {
     int id_motor;
-    char tipo_manutencao;
     int variavel_sentinela;
     double custo_ferramenta;
     int id_ferramenta;
 
-    printf("\n  Insira o ID do motor: ");
-    scanf("%d", &id_motor);
+    // Loop de validação para o ID do Motor
+    do {
+        printf("\n  Insira o ID do motor: ");
+        scanf("%d", &id_motor);
 
-    variavel_sentinela = verificar_id_motor(id_motor, motor, quantidade_motores);
+        variavel_sentinela = verificar_id_motor(id_motor, motor, quantidade_motores);
 
-   
-
-    if (variavel_sentinela == -1){
-        printf("\n" VERMELHO "[ERRO] ID invalida. O motor informado nao existe." RESET "\n");
-        return;
-    }
+        if (variavel_sentinela == -1) {
+            printf("\n" VERMELHO "[ERRO] ID invalida. O motor informado nao existe. Tente novamente." RESET "\n");
+        }
+    } while (variavel_sentinela == -1);
 
     manutencao[*ptr_manutencoes].id = motor[variavel_sentinela].id;
 
-    printf("  Insira o tipo de manutencao (P - Preventiva / C - Corretiva): ");
-    scanf(" %c", &manutencao[*ptr_manutencoes].tipo);
+    // Loop de validação para o Tipo de Manutenção
+    do {
+        printf("  Insira o tipo de manutencao (P - Preventiva / C - Corretiva): ");
+        scanf(" %c", &manutencao[*ptr_manutencoes].tipo);
 
-    if (verificar_tipo_manutencao(manutencao[*ptr_manutencoes].tipo) == -1) {
-        printf("\n" VERMELHO "[ERRO] Entrada invalida para o Tipo de Manutencao." RESET "\n");
-        return;
-    }
+        if (verificar_tipo_manutencao(manutencao[*ptr_manutencoes].tipo) == -1) {
+            printf("\n" VERMELHO "[ERRO] Entrada invalida para o Tipo de Manutencao. Tente novamente." RESET "\n");
+        }
+    } while (verificar_tipo_manutencao(manutencao[*ptr_manutencoes].tipo) == -1);
 
-    printf("  Insira o custo de manutencao: R$ ");
-    scanf("%lf", &custo_ferramenta);
-    if (custo_ferramenta < 0) {
-        printf("\n" VERMELHO "[ERRO] Valor de custo invalido." RESET "\n");
-        return;
-    }
+    // Loop de validação para o Custo
+    do {
+        printf("  Insira o custo de manutencao: R$ ");
+        scanf("%lf", &custo_ferramenta);
+        if (custo_ferramenta < 0) {
+            printf("\n" VERMELHO "[ERRO] Valor de custo invalido. Tente novamente." RESET "\n");
+        }
+    } while (custo_ferramenta < 0);
     manutencao[*ptr_manutencoes].custo = custo_ferramenta;
 
-    
-
-    // CADASTRO DA FERRAMENTA:
+    // CADASTRO DA FERRAMENTA
     printf(CIANO "\n  [ Dados da Ferramenta ]" RESET "\n");
-    printf("    ID da ferramenta: ");
-    scanf("%d", &id_ferramenta);
-    if (id_ferramenta <= 0) {
-        printf("\n" VERMELHO "[ERRO] Valor de ID da ferramenta invalido." RESET "\n");
-        return;
-    }
+
+    // Loop de validação para o ID da Ferramenta
+    do {
+        printf("    ID da ferramenta: ");
+        scanf("%d", &id_ferramenta);
+        if (id_ferramenta <= 0) {
+            printf("\n" VERMELHO "[ERRO] Valor de ID da ferramenta invalido. Tente novamente." RESET "\n");
+        }
+    } while (id_ferramenta <= 0);
     manutencao[*ptr_manutencoes].ferramenta_utilizada.id = id_ferramenta;
 
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa o buffer antes do fgets
 
-    printf("    Nome da ferramenta: ");
-    fgets(manutencao[*ptr_manutencoes].ferramenta_utilizada.nome, CHAR_MAX, stdin);
-    manutencao[*ptr_manutencoes].ferramenta_utilizada.nome[strcspn(manutencao[*ptr_manutencoes].ferramenta_utilizada.nome, "\n")] = '\0';
-    if (manutencao[*ptr_manutencoes].ferramenta_utilizada.nome[0] == '\0') {
-        printf("\n" VERMELHO "[ERRO] Entrada vazia para o nome." RESET "\n");
-        return;
-    }
+    // Loop de validação para o Nome da Ferramenta
+    do {
+        printf("    Nome da ferramenta: ");
+        fgets(manutencao[*ptr_manutencoes].ferramenta_utilizada.nome, CHAR_MAX, stdin);
+        manutencao[*ptr_manutencoes].ferramenta_utilizada.nome[strcspn(manutencao[*ptr_manutencoes].ferramenta_utilizada.nome, "\n")] = '\0';
+        
+        if (manutencao[*ptr_manutencoes].ferramenta_utilizada.nome[0] == '\0') {
+            printf("\n" VERMELHO "[ERRO] Entrada vazia para o nome. Tente novamente." RESET "\n");
+        }
+    } while (manutencao[*ptr_manutencoes].ferramenta_utilizada.nome[0] == '\0');
 
-    printf("    Categoria da ferramenta: ");
-    fgets(manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria, CHAR_MAX, stdin);
-    manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria[strcspn(manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria, "\n")] = '\0';
-    if (manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria[0] == '\0') {
-        printf("\n" VERMELHO "[ERRO] Entrada vazia para a categoria." RESET "\n");
-        return;
-    }
+    // Loop de validação para a Categoria da Ferramenta
+    do {
+        printf("    Categoria da ferramenta: ");
+        fgets(manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria, CHAR_MAX, stdin);
+        manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria[strcspn(manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria, "\n")] = '\0';
+        
+        if (manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria[0] == '\0') {
+            printf("\n" VERMELHO "[ERRO] Entrada vazia para a categoria. Tente novamente." RESET "\n");
+        }
+    } while (manutencao[*ptr_manutencoes].ferramenta_utilizada.categoria[0] == '\0');
 
     printf("\n" VERDE "[SUCESSO] Manutencao registrada para o motor ID %d!" RESET "\n", motor[variavel_sentinela].id);
 
